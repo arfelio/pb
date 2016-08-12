@@ -1,35 +1,35 @@
-import React, { PropTypes } from 'react';
-import Brand from '../components/Brand';
-import _ from 'lodash';
+import React, { Component } from 'react';
+import Header from '../components/Header'
+import AllBrands from '../components/AllBrands'
+import NewBrand from '../components/NewBrand'
 
-// Simple example of a React "smart" component
-export default class BrandCont extends React.Component {
-  static propTypes = {
-    name: PropTypes.string.isRequired, // this is passed from the Rails view
-  };
-
-  constructor(props, context) {
-    super(props, context);
-
-    // How to set initial state in ES6 class syntax
-    // https://facebook.github.io/react/docs/reusable-components.html#es6-classes
-    this.state = { name: this.props.name };
-
-    // Uses lodash to bind all methods to the context of the object instance, otherwise
-    // the methods defined here would not refer to the component's class, not the component
-    // instance itself.
-    _.bindAll(this, 'updateName');
+// Simple example of aqwa React "smart" component
+export default class BrandCont extends Component {
+  state = { items: []}
+  
+  handleSubmit(item) {
+    const newState = this.state.items.concat(item); 
+    this.setState({ items: newState })
   }
-
-  updateName(name) {
-    this.setState({ name });
+  
+  componentDidMount(){
+    this.loadItems()
+  
   }
-
-  render() {
-    return (
+  
+  loadItems(){
+    $.getJSON('/items.json')
+    .then((response) => { 
+      this.setState({ items: response });
+    }); 
+  }
+  
+  render() { 
+    return ( 
       <div>
-        <Brand name={this.state.name} updateName={this.updateName} />
-      </div>
-    );
+        <Header/>
+        <NewBrand handleSubmit={this.handleSubmit.bind(this)}/>
+        <AllBrands items={this.state.items}/> 
+      </div> ) 
   }
 }
